@@ -1,11 +1,13 @@
+import Todo from "./components/Todo"
+
  
 
 function App() {
 
   return (
-    <>
-       Hello world!
-    </>
+    <div className="bg-slate-900 grid py-4 min-h-screen">
+       <Todo />
+    </div>
   )
 }
 
