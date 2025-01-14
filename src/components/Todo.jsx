@@ -1,5 +1,5 @@
 import { RiTodoFill } from "react-icons/ri";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import TodoItems from "./TodoItems";
 import { IoAddCircle } from "react-icons/io5";
 
@@ -9,10 +9,42 @@ const Todo = () => {
 
     const add = () => {
         const inputText = inputRef.current.value.trim();
-        console.log(inputText);
+        
+        if(inputText === "") {
+            return null;
+        }
+
+        const newTodo = {
+            id: Date.now(),
+            text: inputText,
+            isComplete: false,
+        }
+        setTodoList((prev) => [...prev, newTodo]);
+        inputRef.current.value = "";
     }
 
-    const [todoList, setTodoList] = useState([]);
+    const [todoList, setTodoList] = useState(localStorage.getItem("todos") ? JSON.parse(localStorage.getItem("todos")) : []);
+
+    const deleteTodo = (id) => {
+        setTodoList((prevTodos) => {
+           return prevTodos.filter((todo) => todo.id !== id)
+        });
+    }
+
+    const toggle = (id) => {
+        setTodoList((prevTodos) => {
+            return prevTodos.map((todo) => {
+                if(todo.id === id) {
+                    return {...todo, isComplete: !todo.isComplete}
+                }
+            })
+            return todo;
+        })
+    }
+
+    useEffect(() => {
+        localStorage.setItem("todos", JSON.stringify(todoList))
+    }, [todoList])
 
   return (
     <div className="bg-white place-self-center w-11/12 max-w-md flex flex-col p-7 min-h-[550px] rounded-xl">
@@ -40,12 +72,16 @@ const Todo = () => {
                        {/* todo list items */}
 
         <div>
-            <TodoItems 
-            text="Learn coding everyday"
-            />
-            <TodoItems 
-            text="Teach myself cooking everyday"
-            />
+            {todoList.map((item, index) => {
+                return <TodoItems 
+                key={index} 
+                text={item.text} 
+                id={item.id}
+                isComplete={item.isComplete}
+                deleteTodo={deleteTodo}
+                toggle={toggle}
+                />
+            })}
         </div>
     </div>
   )
